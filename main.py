@@ -1,12 +1,21 @@
 # imports
 import os,sys,time
+
 import numpy as np
+
+import pandas as pd
+pd.set_option("display.max_rows", None, "display.max_columns", None)
+
 import cv2
 
+import matplotlib.pyplot as plt
+
+time_record = []
+motion_record = []
 # initialize frame capture and first frame
 webcam = cv2.VideoCapture(0)
 first_frame = None
-
+start_time = time.time()
 while True:
     # check frame status
     (check,original_frame) = webcam.read()
@@ -92,10 +101,21 @@ while True:
     circle_thickness = 5
     line_thickness = 2
 
+
     if targets:
         cv2.circle(target_frame, center_coordinates,target_radius,(51,255,51),circle_thickness)
         cv2.line(target_frame,(mx-target_radius,my),(mx+target_radius,my),(51,255,51),line_thickness)
         cv2.line(target_frame,(mx,my-target_radius),(mx,my+target_radius),(51,255,51),line_thickness)
+        elapsed_time = time.time()-start_time
+        time_record.append(elapsed_time)
+        motion_record.append(1)
+
+    else:
+        elapsed_time = time.time()-start_time
+        time_record.append(elapsed_time)
+        motion_record.append(0)
+
+        #print('no motion detected')
 
     # update first_frame with each iteration
     first_frame = new_grayscale_frame
@@ -112,3 +132,25 @@ while True:
 webcam.release()
 # close all windows
 cv2.destroyAllWindows()
+
+
+plt.plot(time_record, motion_record)
+plt.xlabel('Time (seconds)')
+plt.ylabel('Mtion Status')
+plt.title('Motion Graph')
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
